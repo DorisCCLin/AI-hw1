@@ -1,0 +1,345 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd"
+    >
+<html lang="en">
+<head>
+	<title>CS 510: Introduction to Artificial Intelligence</title>
+
+	<style>
+	table {
+	  font-family: arial, sans-serif;
+	  border-collapse: collapse;
+	}
+
+	td, th {
+	  border: 1px solid #A9A9A9;
+	  text-align: left;
+	  padding: 8px;
+	}
+
+	th{
+
+	}
+
+	tr:nth-child(even) {
+	  background-color: #dddddd;
+	}
+	</style>
+</head>
+<body text="#000000" bgcolor="#dfdfdf" link="#0000FF" vlink="#551A8B" alink="#0000FF">
+
+<center>
+<font color="#1822CD">
+  <h1> CS 510: Introduction to Artificial Intelligence </h1>
+</font>
+<h2>Homework 1</h2>
+Due date : <font color="#FF0000"> April 29th (04/29/20)  </font><br>
+Programing Assignment (100 points)
+
+</center>
+
+
+<br><hr><br>
+
+<h2>
+Sliding Brick Puzzle
+<h2>
+
+<h3>Part 1</h3>
+
+Many of you might have played one or another version of the "sliding brick puzzle" (SBP). If you have not, you can play one <a href="http://www.mathplayground.com/slidingblock.html">here</a>. And if you like it, you can play a rather challenging one <a href="http://www.bricks-game.de/">here</a> (although this last one, unfortunately, only runs on Windows machines). For the next several assignments, you will create a program that can solve the SBP. In this assignment you will just have to create data structures and functions to represent the game state, and perform the various needed operations such as: determining the set of valid moves, execute the moves or determine whether a we have solved the puzzle.<br>
+<br>
+<ul>
+	<li>A sliding brick puzzle is played on a rectangular <i>w</i> by <i>h</i> board (<i>w</i> cells wide and <i>h</i> cells tall). Each cell in the board can be either <i>free</i>, have a <i>wall</i>, or be the <i>goal</i></li>
+	<li>On top of the board (over some of the free cells) there is a set of solid pieces (or <i>bricks</i>) that can be moved around the board. One of the bricks is special (the <i>master brick</i>).</li>
+	<li>A move consists of sliding one of the bricks one cell up, down, left or right. Notice that bricks collide with either walls or other bricks, so we cannot move a brick on top of another. Bricks can only slide, they cannot rotate nor be flipped.</li>
+	<li>To solve the puzzle, we have to find a sequence of moves that allows you to move the master brick on top of the goal. No other pieces are allowed to be placed on top of the goal</li>
+</ul>
+
+Here is an illustration of a particular configuration of a SBP (but if you still do not understand how the game works, just see this <a href="http://www.youtube.com/watch?v=Qdzv1k4Ubl4">video</a>, or play the game in one of the links above)<br>
+<br>
+<center><img src="SBP1.png" height="300"></center><br>
+<br>
+
+You can complete this assignment in either Java or Python (if you like to to complete it in any other language please confirm it with the instructors first). Choose your programming language, and complete the following tasks:<br>
+
+<h3>1.A: State representation</h3>
+
+In this task, you will write code to represent the game state, load a game state from disk, and display a game state in the screen. You will have to create a <i>class</i> (recommended) or just a set of functions for completing this task.<br>
+We will represent the game state as an integer matrix, as shown in this example:<br>
+<br>
+<center><img src="SBP2.png" height="300"></center><br>
+<br>
+The matrix will have the same dimensions as the game board, and each position in the matrix has the following meaning:
+<ul>
+	<li>-1: represents the goal</li>
+	<li>0: means that the cell is empty</li>
+	<li>1: means that there is a wall</li>
+	<li>2: means that the master brick is on top of this cell</li>
+	<li>any number higher or equal than 3: represents each of the other bricks</li>
+</ul>
+Thus, as you can see, each piece in the board is assigned an integer: the master brick is assigned number 2, and the other bricks are assigned numbers starting from 3.<br>
+<br>
+<ul>
+	<li>Write a function that allows you to load a game state from disk. The input to the function should be just the name of the file. The file format that you have to use is the following:<br>
+<pre>
+w,h,
+Row 1 of the matrix with values separated by commas,
+...
+Row h of the matrix with values separated by commas,
+</pre>
+	You can use these four files as examples: <a href="SBP-level0.txt">SBP-level0.txt</a>, <a href="SBP-level1.txt">SBP-level1.txt</a>, <a href="SBP-level2.txt">SBP-level2.txt</a>, <a href="SBP-level3.txt">SBP-level3.txt</a>.<br>
+	</li>
+
+	<li>Write a function that outputs the game state in the screen. For example, if you load the file SBP-level0.txt, the display state function should output the following to the screen:<br>
+<pre>
+5,4,
+1,-1,-1,1,1,
+1,0,3,4,1,
+1,0,2,2,1,
+1,1,1,1,1,
+</pre>
+	</li>
+
+	<li>Write a function that <i>clones</i> a state. That is that returns a separate state that is identical to the original one.</li>
+</ul>
+
+<h3>1.B: Puzzle Complete Check</h3>
+
+Write a function that returns <i>true</i> if a given state represent a solved puzzle (i.e. if the master brick is on top of the goal). Notice that checking this is very easy, since you only have to go over the matrix, and see if there is any cell with the value -1. If there is, that means that the puzzle is not solved, if there is not, then the puzzle is solved (since only the master brick can cover the goal cells).
+<br>
+
+For example, your function should return false with this <a href="SBP-level0.txt">SBP-level0.txt</a>, but true with this <a href="SBP-level0-solved.txt">SBP-level0-solved.txt</a>.
+
+<h3>1.C: Move Generation</h3>
+
+Since each piece has a unique integer identifier, we will represent moves as a pair (piece,direction). Each piece can only move one cell at a time, in any of the four directions. For example a possible move in the following board is (10,down):<br>
+<br>
+<center><img src="SBP3.png" height="300"></center><br>
+<br>
+<ul>
+	<li>Write a function that given a state and a piece, it returns a list of all the moves the piece can perform (notice that the list can be empty). Define a class or a struct to represent a "move". Feel free to encode the direction (up, down, left, right) however you want. For example, you can use a <i>character</i> to represent direction ('u','d','l','r'), or an integer. That is up to you.</li>
+	<li>Write a function that given a state, it returns all the moves that can be done in a board (that is the union of the moves that each individual piece can perform).</li>
+	<li>Implement a function 'applyMove' that given a state and a move, it performs the move in the state</li>
+	<li>Implement a function 'applyMoveCloning' that given a state and a move, returns a new state, resulting from applying the move (i.e. first clones the state, and then applies the move).</li>
+</ul>
+
+<h3>1.D: State Comparison</h3>
+
+Write a function that compares two states, and returns <i>true</i> if they are identical, and <i>false</i> if they are not. Do so using the simplest possible approach: just iterate over each position in the matrix that represents the state, and compare the integers one by one. If they are all identical, the states are identical, otherwise they are not.<br>
+
+<h3>1.E: Normalization</h3>
+
+Notice that the previous state comparison function has a problem. Consider the following two states:<br>
+<br>
+<center><img src="SBP4.png" height="300"></center><br>
+<br>
+The previous function will consider these two states as different. However, it's quite obvious that the states are equivalent. In order to solve this problem, we are going to define a <i>normal form</i> for a state:<br>
+<br>
+If we give an index to each cell in the board starting from the top-left corner and going down row by row from left to right (top-left corner has index 0, the cell right next to it has index 1, etc.), then we can assign an index <i>I(b)</i> to a brick <i>b</i>, as the smallest index covered by the brick. This is illustrated in the following figure:<br>
+<br>
+Now, a state is in normal form if, given two bricks (that are not the master brick) with numbers <i>n</i> and <i>m</i>. If <i>n &lt m</i> then we know that <i>P(n) &lt P(m)</i>.<br>
+<br>
+Write a function that given a state, it transforms it into normal form. See the expected effect of this function in this image:<br>
+<br>
+<br>
+<center><img src="SBP5.png" height="300"></center><br>
+<br>
+Notice that this is simpler than it seems. It can be done with the following algorithm:<br>
+<pre>
+int nextIdx = 3;
+for(i = 0;i &lt h;i++) {
+  for(j = 0;j &lt w;j++) {
+    if (matrix[j][i]==nextIdx) {
+      nextIdx++;
+    } else if (matrix[j][i] &gt nextIdx) {
+      swapIdx(nextIdx,matrix[j][i]);
+      nextIdx++;
+    }
+  }
+}
+</pre>
+Where the swapIdx function simply does this:<br>
+<pre>
+swapIdx(int idx1,int idx2) {
+  for(i = 0;i &lt h;i++) {
+    for(j = 0;j &lt w;j++) {
+      if (matrix[j][i]==idx1) {
+        matrix[j][i]=idx2;
+      } else if (matrix[j][i]==idx2) {
+        matrix[j][i]=idx1;
+      }
+    }
+  }
+}
+</pre>
+This normalization function will be very useful in the following assignments to compare game states, and see if they are equivalent or not. You can test if your version works with this state <a href="SBP-test-not-normalized.txt">SBP-test-not-normalized.txt</a>. Make sure you obtain the same result as in the figure above.<br>
+
+<h3>1.F: Random Walks</h3>
+
+Write a function that given a state and a positive integer <i>N</i>, does the following: 1) generate all the moves that can be generated in the board, 2) select one at random, 3) execute it, 4) normalize the resulting game state, 5) if we have reached the goal, or if we have executed N moves, stop; otherwise, go back to 1.<br>
+<br>
+Please print both the move and the game state on screen after each iteration of the method. For example, loading the file <a href="SBP-level0.txt">SBP-level0.txt</a>, and executing a random walk with N = 3, a possible output can be this:<br>
+<pre>
+5,4,
+1,-1,-1,1,1,
+1,0,3,4,1,
+1,0,2,2,1,
+1,1,1,1,1,
+
+(2,left)
+
+5,4,
+1,-1,-1,1,1,
+1,0,3,4,1,
+1,2,2,0,1,
+1,1,1,1,1,
+
+(2,right)
+
+5,4,
+1,-1,-1,1,1,
+1,0,3,4,1,
+1,0,2,2,1,
+1,1,1,1,1,
+
+(3,left)
+
+5,4,
+1,-1,-1,1,1,
+1,3,0,4,1,
+1,0,2,2,1,
+1,1,1,1,1,
+</pre>
+
+
+<br><hr><br>
+
+
+
+
+
+<h3>Part 2</h3>
+
+Using the code you wrote for part 1, write:
+<ul>
+	<li>A function that solves a given sliding bricks puzzle using a <i>breadth-first strategy</i>.</li>
+	<li>A function that solves a given sliding bricks puzzle using a <i>depth-first strategy</i>.</li>
+	<li>A function that solves a given sliding bricks puzzle using an <i>iterative deepening</i> search strategy.</li>
+</ul>
+
+Notice that the search space is a <b>graph</b>, so you will have to keep track of all the states visited so far, and make sure your algorithm does not get stuck in loops.<br>
+<br>
+
+When the solution is found, it should be printed to screen. Print the list of moves required to solve the state, and the final state of the puzzle, for example (<b>pay attention to spaces and newlines</b>):<br>
+<pre>
+(2,left)
+(4,down)
+(3,right)
+(2,up)
+(2,up)
+5,4,
+1,2,2,1,1,
+1,0,0,3,1,
+1,0,0,4,1,
+1,1,1,1,1,
+</pre>
+
+
+
+
+Together with the source code, turn in (in a plain text file called 'output-hw1.txt') the output that your program generates for the following four levels: <a href="SBP-level0.txt">SBP-level0.txt</a>, <a href="SBP-level1.txt">SBP-level1.txt</a>, <a href="SBP-level2.txt">SBP-level2.txt</a>, <a href="SBP-level3.txt">SBP-level3.txt</a>. Also, at the end of your output file, output a line as below:<br>
+<br>
+<i> #nodes time length </i><br>
+<br>
+where <i>#nodes</i> is the number of nodes explored, <i>time</i> is the time the search took in seconds and fractions of seconds (e.g., 2.53 for 2 seconds and 53/100) and <i>length</i> is the length of the solution found.
+
+<br>
+Using these search strategies, it is unlikely that your program handles puzzles much larger than the ones linked above. But in case you want to test out the limits of your program, you can use these more complex puzzles: <a href="SBP-bricks-level1.txt">SBP-bricks-level1.txt</a>, <a href="SBP-bricks-level2.txt">SBP-bricks-level2.txt</a>, <a href="SBP-bricks-level3.txt">SBP-bricks-level3.txt</a>, <a href="SBP-bricks-level4.txt">SBP-bricks-level4.txt</a>, <a href="SBP-bricks-level5.txt">SBP-bricks-level5.txt</a>, <a href="SBP-bricks-level6.txt">SBP-bricks-level6.txt</a>, <a href="SBP-bricks-level7.txt">SBP-bricks-level7.txt</a>.
+<br><br>
+<b>IMPORTANT: write all of the code above to be run from command line and to display its output to the console. Do not create any graphical user interfaces and do not ask the user for any input.</b>
+
+<br><hr><br>
+
+<h3>Part 3: Extra Credit (10 points)</h3>
+Using the code you wrote for part 1 and 2, write a function that solves a given sliding bricks puzzle using A*.<br>
+<br>
+As a heuristic, use the Manhattan distance between the master brick and the goal.<br>
+
+
+<br><hr><br>
+<h3>What to Submit</h3><br>
+
+All homework for this course must be submitted electronically using Blackboard. Do not e-mail your assignment to a TA or Instructor! If you are having difficulty with your Blackboard account, you are responsible for resolving these problems with a TA, an Instructor, or someone from IRT, before the assignment it due. If you have any doubts, complete your work early so that a TA or someone from IRT can help you if you have difficulty. Remember that your code MUST run on TUX. Code that doesn't compile or run there will receive a grade of zero.<br>
+<br>
+For this assignment, you must submit:<br>
+<ul>
+<li>Your Python/Java source code (make sure it is well commented and works on tux). </li>
+
+<li>Written documentation for your program including your name, what files are and what they contain, also the compilation and execution instructions. Also, in case you have not completed your assignment or it does not work as expected, remember to include what works and what does not.</li>
+
+<li> A Makefile or a Bash script named hw1.sh (for use on tux) in a way that
+	<ul>
+		<li> Running the executable file named “hw1” generated by command “make” in the same directory </li>
+		<li> Or running ./hw1.sh </li>
+	</ul>
+must implement the main function and associated functions/methods described above on tux. (without this file, your code cannot be compiled nor verified)
+</li>
+
+<li>A plain text file called “output-hw1.txt” and generated on tux (very important!) which shows the output your program generates when run. You can easily generate this file using redirection, e.g.: “./hw1 > output-hw1.txt”. </li>
+
+<li>Use a compression utility so that you can compress your files into a single ZIP file (NOT RAR, nor any other compression format) and just upload it.</li>
+
+</ul>
+
+
+<br><hr><br>
+
+Grading Rubric:<br><br>
+
+<table>
+  <tr>
+    <th>Item</th>
+    <th>Points</th>
+  </tr>
+  <tr>
+    <td>Random Walk (proper algorithm, well commented)</td>
+    <td>10</td>
+  </tr>
+  <tr>
+    <td>BFS (proper algorithm, optimal solution, well commented)</td>
+    <td>22</td>
+  </tr>
+  <tr>
+    <td>DFS (proper algorithm, optimal solution, well commented)</td>
+    <td>22</td>
+  </tr>
+  <tr>
+    <td>IDS (proper algorithm, optimal solution, well commented)</td>
+    <td>22</td>
+  </tr>
+  <tr>
+    <td>README</td>
+    <td>9</td>
+  </tr>
+  <tr>
+    <td>Output-hw1.txt generated on tux</td>
+    <td>15</td>
+  </tr>
+  <tr>
+    <td>A* (proper algorithm, optimal solution, well commented)</td>
+    <td>10 (extra)</td>
+  </tr>
+
+</table>
+
+
+
+
+<h3>Academic Honesty</h3><br>
+
+You must compose all program and written material yourself, including answers to book questions. All material taken from outside sources must be appropriately cited. If you need assistance with this aspect of the assignment, see a consultant during consulting hours.<br>
+
+
+</body>
+</html>
